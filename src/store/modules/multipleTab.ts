@@ -2,18 +2,18 @@ import type { RouteLocationNormalized, RouteLocationRaw, Router } from 'vue-rout
 
 import { toRaw, unref } from 'vue';
 import { defineStore } from 'pinia';
-import { store } from '/@/store';
+import { store } from '@/store';
 
-import { useGo, useRedo } from '/@/hooks/web/usePage';
-import { Persistent } from '/@/utils/cache/persistent';
+import { useGo, useRedo } from '@/hooks/web/usePage';
+import { Persistent } from '@/utils/cache/persistent';
 
-import { PageEnum } from '/@/enums/pageEnum';
-import { PAGE_NOT_FOUND_ROUTE, REDIRECT_ROUTE } from '/@/router/routes/basic';
-import { getRawRoute } from '/@/utils';
-import { MULTIPLE_TABS_KEY } from '/@/enums/cacheEnum';
+import { PageEnum } from '@/enums/pageEnum';
+import { PAGE_NOT_FOUND_ROUTE, REDIRECT_ROUTE } from '@/router/routes/basic';
+import { getRawRoute } from '@/utils';
+import { MULTIPLE_TABS_KEY } from '@/enums/cacheEnum';
 
-import projectSetting from '/@/settings/projectSetting';
-import { useUserStore } from '/@/store/modules/user';
+import projectSetting from '@/settings/projectSetting';
+import { useUserStore } from '@/store/modules/user';
 
 export interface MultipleTabState {
   cacheTabList: Set<string>;
@@ -134,7 +134,7 @@ export const useMultipleTabStore = defineStore({
       // Existing pages, do not add tabs repeatedly
       const tabHasExits = this.tabList.some((tab, index) => {
         updateIndex = index;
-        return (tab.fullPath || tab.path) === (fullPath || path);
+        return decodeURIComponent(tab.fullPath || tab.path) === decodeURIComponent(fullPath || path);
       });
 
       // If the tab already exists, perform the update operation
@@ -308,7 +308,7 @@ export const useMultipleTabStore = defineStore({
 
       for (const path of closePathList) {
         if (path !== route.fullPath) {
-          const closeItem = this.tabList.find((item) => item.path === path);
+          const closeItem = this.tabList.find((item) => item.fullPath === path);
           if (!closeItem) {
             continue;
           }
@@ -320,6 +320,7 @@ export const useMultipleTabStore = defineStore({
       }
       this.bulkCloseTabs(pathList);
       this.updateCacheTab();
+      Persistent.setLocal(MULTIPLE_TABS_KEY, this.tabList, true);
       handleGotoPage(router);
     },
 

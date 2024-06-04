@@ -5,15 +5,14 @@
     </CollapseContainer>
 
     <CollapseContainer title="超过3行自动收起，折叠时保留2行" class="mt-4">
-      <BasicForm @register="register1" />
+      <BasicForm @register="register1" @advanced-change="onAdvancedChange" />
     </CollapseContainer>
   </PageWrapper>
 </template>
-<script lang="ts">
-  import { defineComponent } from 'vue';
-  import { BasicForm, FormSchema, useForm } from '/@/components/Form/index';
-  import { CollapseContainer } from '/@/components/Container';
-  import { PageWrapper } from '/@/components/Page';
+<script lang="ts" setup>
+  import { BasicForm, FormSchema, useForm } from '@/components/Form';
+  import { CollapseContainer } from '@/components/Container';
+  import { PageWrapper } from '@/components/Page';
 
   const getSchamas = (): FormSchema[] => {
     return [
@@ -148,48 +147,48 @@
       },
     ];
   }
-  export default defineComponent({
-    components: { BasicForm, CollapseContainer, PageWrapper },
-    setup() {
-      const [register] = useForm({
-        labelWidth: 120,
-        schemas: getSchamas(),
-        actionColOptions: {
-          span: 24,
-        },
-        compact: true,
-        showAdvancedButton: true,
-      });
-      const extraSchemas: FormSchema[] = [];
-      for (let i = 14; i < 30; i++) {
-        extraSchemas.push({
-          field: 'field' + i,
-          component: 'Input',
-          label: '字段' + i,
-          colProps: {
-            span: 8,
-          },
-        });
-      }
-      const [register1] = useForm({
-        labelWidth: 120,
-        schemas: [
-          ...getSchamas(),
-          ...getAppendSchemas(),
-          { field: '', component: 'Divider', label: '更多字段' },
-          ...extraSchemas,
-        ],
-        actionColOptions: {
-          span: 24,
-        },
-        compact: true,
-        showAdvancedButton: true,
-        alwaysShowLines: 2,
-      });
-      return {
-        register,
-        register1,
-      };
+  const [register] = useForm({
+    labelWidth: 120,
+    schemas: getSchamas(),
+    actionColOptions: {
+      span: 24,
     },
+    compact: true,
+    showAdvancedButton: true,
   });
+  const extraSchemas: FormSchema[] = [];
+  for (let i = 14; i < 30; i++) {
+    extraSchemas.push({
+      field: 'field' + i,
+      component: 'Input',
+      label: '字段' + i,
+      colProps: {
+        span: 8,
+      },
+    });
+  }
+  const [register1] = useForm({
+    labelWidth: 120,
+    schemas: [
+      ...getSchamas(),
+      ...getAppendSchemas(),
+      { field: '', component: 'Divider', label: '更多字段' },
+      ...extraSchemas,
+    ],
+    actionColOptions: {
+      span: 24,
+    },
+    compact: true,
+    showAdvancedButton: true,
+    alwaysShowLines: 2,
+  });
+
+  function onAdvancedChange(isAdvanced: boolean) {
+    console.log('isAdvanced: ' + isAdvanced);
+    if (isAdvanced) {
+      // do something
+    } else {
+      // do something
+    }
+  }
 </script>

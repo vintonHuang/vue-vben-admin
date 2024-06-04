@@ -21,7 +21,10 @@ function defineApplicationConfig(defineOptions: DefineOptions = {}) {
   return defineConfig(async ({ command, mode }) => {
     const root = process.cwd();
     const isBuild = command === 'build';
-    const { VITE_USE_MOCK, VITE_BUILD_COMPRESS, VITE_ENABLE_ANALYZE } = loadEnv(mode, root);
+    const { VITE_PUBLIC_PATH, VITE_USE_MOCK, VITE_BUILD_COMPRESS, VITE_ENABLE_ANALYZE } = loadEnv(
+      mode,
+      root,
+    );
 
     const defineData = await createDefineData(root);
     const plugins = await createPlugins({
@@ -35,21 +38,12 @@ function defineApplicationConfig(defineOptions: DefineOptions = {}) {
     const pathResolve = (pathname: string) => resolve(root, '.', pathname);
 
     const applicationConfig: UserConfig = {
+      base: VITE_PUBLIC_PATH,
       resolve: {
         alias: [
           {
             find: 'vue-i18n',
             replacement: 'vue-i18n/dist/vue-i18n.cjs.js',
-          },
-          // /@/xxxx => src/xxxx
-          {
-            find: /\/@\//,
-            replacement: pathResolve('src') + '/',
-          },
-          // /#/xxxx => types/xxxx
-          {
-            find: /\/#\//,
-            replacement: pathResolve('types') + '/',
           },
           // @/xxxx => src/xxxx
           {
@@ -69,6 +63,8 @@ function defineApplicationConfig(defineOptions: DefineOptions = {}) {
         cssTarget: 'chrome80',
         rollupOptions: {
           output: {
+            // 入口文件名（不能变，否则所有打包的 js hash 值全变了）
+            entryFileNames: 'index.js',
             manualChunks: {
               vue: ['vue', 'pinia', 'vue-router'],
               antd: ['ant-design-vue', '@ant-design/icons-vue'],
@@ -87,7 +83,7 @@ function defineApplicationConfig(defineOptions: DefineOptions = {}) {
       plugins,
     };
 
-    const mergedConfig = mergeConfig(commonConfig, applicationConfig);
+    const mergedConfig = mergeConfig(commonConfig(mode), applicationConfig);
 
     return mergeConfig(mergedConfig, overrides);
   });

@@ -1,30 +1,30 @@
 <script lang="tsx">
-  import type { DescriptionProps, DescInstance, DescItem } from './typing';
-  import type { DescriptionsProps } from 'ant-design-vue/es/descriptions/index';
-  import type { CollapseContainerOptions } from '/@/components/Container/index';
+  import type { CollapseContainerOptions } from '@/components/Container';
+  import { CollapseContainer } from '@/components/Container';
+  import { useDesign } from '@/hooks/web/useDesign';
+  import { getSlot } from '@/utils/helper/tsxHelper';
+  import { isFunction } from '@/utils/is';
+  import { useAttrs } from '@vben/hooks';
+  import { Descriptions } from 'ant-design-vue';
+  import type { DescriptionsProps } from 'ant-design-vue/es/descriptions';
+  import { get } from 'lodash-es';
   import {
+    computed,
+    defineComponent,
+    ref,
+    toRefs,
+    unref,
     type CSSProperties,
     type PropType,
-    defineComponent,
-    computed,
-    ref,
-    unref,
-    toRefs,
   } from 'vue';
-  import { get } from 'lodash-es';
-  import { Descriptions } from 'ant-design-vue';
-  import { CollapseContainer } from '/@/components/Container/index';
-  import { useDesign } from '/@/hooks/web/useDesign';
-  import { isFunction } from '/@/utils/is';
-  import { getSlot } from '/@/utils/helper/tsxHelper';
-  import { useAttrs } from '@vben/hooks';
+  import type { DescInstance, DescItem, DescriptionProps } from './typing';
 
   const props = {
     useCollapse: { type: Boolean, default: true },
     title: { type: String, default: '' },
     size: {
       type: String,
-      validator: (v) => ['small', 'default', 'middle', undefined].includes(v),
+      validator: (v: string) => ['small', 'default', 'middle', undefined].includes(v),
       default: 'small',
     },
     bordered: { type: Boolean, default: true },
@@ -175,7 +175,7 @@
         const { title } = unref(getMergeProps);
 
         return (
-          <CollapseContainer title={title} canExpan={canExpand} helpMessage={helpMessage}>
+          <CollapseContainer title={title} canExpand={canExpand} helpMessage={helpMessage}>
             {{
               default: () => content,
               action: () => getSlot(slots, 'action'),
